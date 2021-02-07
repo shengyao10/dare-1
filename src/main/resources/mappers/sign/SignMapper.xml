@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.sign.mapper.SignMapper">
+
+    <select id="getEmpNo" resultType="String">
+        select u.emp_no
+        from sys_user u
+        where username = #{username}
+    </select>
+
+    <select id="findSign" resultType="String">
+        select e.sign
+        from sign e
+        where emp_no = #{emp_no}
+    </select>
+
+    <select id="findDept" resultType="String">
+        select d.dept_name
+        from hrm_employee e
+        left join hrm_dept d on e.dept_id=d.dept_id
+        where emp_no = #{emp_no}
+    </select>
+
+    <select id="findFile" resultType="String">
+        select e.sign_file
+        from apqp_file e
+        where project_no = #{project} and apqp_no = #{apqpNo} and reject=0
+    </select>
+    <select id="getFile" resultType="String">
+        select e.file_path
+        from apqp_file e
+        where project_no = #{project} and apqp_no = #{apqpNo} and reject=0
+    </select>
+
+    <select id="findJointlySigned" resultType="int">
+        select a.jointly_signed
+        from apqp_file a
+        where project_no = #{project} and apqp_no = #{apqpNo} and reject=0
+    </select>
+
+    <select id="findJointlySign" resultType="int">
+        select f.jointly_sign
+        from file_information f
+        where apqp_no = #{apqpNo}
+    </select>
+
+    <select id="findExamined" resultType="int">
+        select a.examined
+        from apqp_file a
+        where project_no = #{project} and apqp_no = #{apqpNo} and reject=0
+    </select>
+
+    <select id="findExamine" resultType="int">
+        select f.examine
+        from file_information f
+        where apqp_no = #{apqpNo}
+    </select>
+    <select id="getSignListBeforeStep" resultType="com.dare.modules.sign.vo.SignPersonDetailVO">
+        select id, apqp_no, project_no, examine1, examine2, examine3, jointly_sign1, jointly_sign2, jointly_sign3, jointly_sign4, jointly_sign5, jointly_sign6, approve, examine_time1, examine_time2, examine_time3, jointly_sign_time1, jointly_sign_time2, jointly_sign_time3, jointly_sign_time4, jointly_sign_time5, jointly_sign_time6, reject
+        from sign_person
+        where project_no = #{projectNo} AND reject = 0 AND
+        apqp_no IN (
+        select apqp_step_no
+        from apqp_schedule
+        where project_no = #{projectNo} AND file_state = 1
+        AND
+        id &lt; (
+        select id
+        from apqp_schedule
+        where project_no = #{projectNo} AND apqp_step_no = #{apqpNo}
+        )
+        )
+    </select>
+    <select id="getProjrct" resultType="com.dare.modules.project.entity.Project">
+        select id, project_no, project_name, customer_no, start_time, end_time, apqp_state, project_state, project_task, complete_task, pro_complete_state, created_by, gmt_created, gmt_modified
+        from project
+        where project_no = #{projectNo}
+    </select>
+    <update id="updateProject" parameterType="com.dare.modules.project.entity.Project">
+        update project set
+        complete_task=#{completeTask},pro_complete_state=#{proCompleteState},project_state=#{projectState}
+        where project_no = #{projectNo}
+    </update>
+
+    <update id="updateJointlySigned" parameterType="com.dare.modules.sign.entity.Sign">
+        update apqp_file set
+        jointly_signed = #{jointlySigned}
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=#{reject}
+    </update>
+
+    <update id="updateapprovaled" parameterType="com.dare.modules.sign.entity.Sign">
+        update apqp_file set
+        approved = #{approvaled}
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=#{reject}
+    </update>
+
+    <update id="updateExamined" parameterType="com.dare.modules.sign.entity.Sign">
+        update apqp_file set
+        examined = #{examined}
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=#{reject}
+    </update>
+    <update id="updateSignFile" parameterType="com.dare.modules.sign.entity.Sign">
+        update apqp_file set
+        sign_file = #{signFile}
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=#{reject}
+    </update>
+
+    <update id="updateRate" parameterType="com.dare.modules.sign.entity.Sign">
+        update apqp_file set
+        progress_rate = #{rate}
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=#{reject}
+    </update>
+
+    <update id="updateState" parameterType="com.dare.modules.sign.vo.ApqpStateVO">
+        update apqp_schedule set
+        state = #{state}
+        where project_no = #{projectNo} and apqp_step_no = #{apqpNo}
+    </update>
+    <update id="updateFileState" parameterType="com.dare.modules.sign.vo.ApqpStateVO">
+        update apqp_schedule set
+        file_state = #{fileState}
+        where project_no = #{projectNo} and apqp_step_no = #{apqpNo}
+    </update>
+
+    <update id="updateSignPerson" parameterType="com.dare.modules.sign.entity.SignPerson">
+        update sign_person set
+        examine1 = ifnull(examine1,#{examine1}),
+        examine2 = ifnull(examine2,#{examine2}),
+        examine3 = ifnull(examine3,#{examine3}),
+        jointly_sign1 = ifnull(jointly_sign1,#{jointlySign1}),
+        jointly_sign2 = ifnull(jointly_sign2,#{jointlySign2}),
+        jointly_sign3 = ifnull(jointly_sign3,#{jointlySign3}),
+        jointly_sign4 = ifnull(jointly_sign4,#{jointlySign4}),
+        jointly_sign5 = ifnull(jointly_sign5,#{jointlySign5}),
+        jointly_sign6 = ifnull(jointly_sign6,#{jointlySign6}),
+        approve = ifnull(approve,#{approve}),
+        examine_time1 = ifnull(examine_time1,#{examineTime1}),
+        examine_time2 = ifnull(examine_time2,#{examineTime2}),
+        examine_time3 = ifnull(examine_time3,#{examineTime3}),
+        jointly_sign_time1 = ifnull(jointly_sign_time1,#{jointlySignTime1}),
+        jointly_sign_time2 = ifnull(jointly_sign_time2,#{jointlySignTime2}),
+        jointly_sign_time3 = ifnull(jointly_sign_time3,#{jointlySignTime3}),
+        jointly_sign_time4 = ifnull(jointly_sign_time4,#{jointlySignTime4}),
+        jointly_sign_time5 = ifnull(jointly_sign_time5,#{jointlySignTime5}),
+        jointly_sign_time6 = ifnull(jointly_sign_time6,#{jointlySignTime6})
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=#{reject}
+    </update>
+    <update id="rejectSignPerson" parameterType="com.dare.modules.sign.entity.SignPerson">
+        update sign_person set
+        reject=#{reject},reject_reason=#{rejectReason},reject_time=#{rejectTime}
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=0
+    </update>
+    <update id="rejectFile" parameterType="com.dare.modules.sign.entity.Sign">
+        update apqp_file set
+        reject=#{reject}
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=0
+    </update>
+    <insert id="insertSignPerson" parameterType="com.dare.modules.sign.entity.SignPerson">
+        insert into
+        sign_person(id, apqp_no, project_no,reject)
+        values
+        (#{id}, #{apqpNo}, #{projectNo},0)
+    </insert>
+    <insert id="saveList">
+        insert into
+        sign_person(apqp_no, project_no, examine1, examine2, examine3, jointly_sign1, jointly_sign2, jointly_sign3, jointly_sign4,
+        jointly_sign5, jointly_sign6, approve, examine_time1, examine_time2, examine_time3, jointly_sign_time1, jointly_sign_time2,
+        jointly_sign_time3, jointly_sign_time4, jointly_sign_time5, jointly_sign_time6, reject)
+        values
+        <foreach collection="signs" item="item" separator=",">
+            (#{item.apqpNo}, #{item.projectNo}, #{item.examine1}, #{item.examine2}, #{item.examine3}, #{item.jointlySign1}, #{item.jointlySign2}, #{item.jointlySign3}, #{item.jointlySign4},
+            #{item.jointlySign5}, #{item.jointlySign6}, #{item.approve}, #{item.examineTime1}, #{item.examineTime2}, #{item.examineTime3}, #{item.jointlySignTime1}, #{item.jointlySignTime2},
+            #{item.jointlySignTime3}, #{item.jointlySignTime4}, #{item.jointlySignTime5}, #{item.jointlySignTime6}, #{item.reject})
+        </foreach>
+    </insert>
+
+    <delete id="deleteFile" parameterType="String">
+        delete from apqp_file where project_no = #{project} and apqp_no = #{apqpNo}
+    </delete>
+    <delete id="deleteSign" parameterType="String">
+        delete from sign_person where project_no = #{project} and apqp_no = #{apqpNo}
+    </delete>
+    <delete id="deleteSignPerson">
+        delete from sign_person
+        where project_no = #{projectNo} AND apqp_no = #{apqpNo} AND reject = 0
+    </delete>
+
+    <select id="selectSignPerson" resultType="com.dare.modules.sign.entity.SignPerson">
+        select a.*
+        from sign_person a
+        where project_no = #{project} and apqp_no = #{apqpNo} and reject=0
+    </select>
+    <select id="getRejectInformation" resultType="com.dare.modules.sign.vo.RejectVO">
+        select a.reject_time,a.reject_reason
+        from sign_person a
+        where project_no = #{projectNo} and apqp_no = #{apqpNo} and reject=1
+    </select>
+
+
+</mapper>

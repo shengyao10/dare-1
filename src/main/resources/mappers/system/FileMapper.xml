@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.system.mapper.FileMapper">
+    <insert id="save">
+        insert into apqp_file(file_name, project_no, apqp_no, file_path, gmt_created, gmt_modified, examined, jointly_signed, approved, edition, sign_file, progress_rate, reject)
+        values (#{fileName}, #{projectNo}, #{apqpNo}, #{filePath}, #{gmtCreated}, #{gmtModified}, #{examined}, #{jointlySigned}, #{approved}, #{edition}, #{signFile}, #{progressRate}, #{reject})
+    </insert>
+    <insert id="saveList">
+        insert into apqp_file(file_name, project_no, apqp_no, file_path, gmt_created, gmt_modified, examined,
+        jointly_signed, approved, edition, sign_file, progress_rate, reject)
+        values
+        <foreach collection="files" item="file" separator=",">
+            (#{file.fileName}, #{file.projectNo}, #{file.apqpNo}, #{file.filePath}, #{file.gmtCreated},
+            #{file.gmtModified}, #{file.examined}, #{file.jointlySigned}, #{file.approved}, #{file.edition},
+            #{file.signFile}, #{file.progressRate}, #{file.reject})
+        </foreach>
+    </insert>
+    <update id="updateFileState">
+        update apqp_schedule
+        set file_state = 1
+        where project_no = #{projectNo} AND apqp_step_no = #{apqpNo}
+    </update>
+    <delete id="deleteFile">
+        delete from apqp_file
+        where project_no = #{projectNo} AND apqp_no = #{apqpNo} AND reject = 0
+    </delete>
+    <select id="getFileName" resultType="java.lang.String">
+        select file_name
+        from apqp_file
+        where project_no = #{projectNo} AND apqp_no = #{apqpNo} AND reject = 0
+    </select>
+    <select id="isUpload" resultType="java.lang.Integer">
+        select count(*)
+        from apqp_file
+        where project_no = #{projectNo} AND apqp_no = #{apqpNo} AND reject = 0
+    </select>
+    <select id="getFileListBeforeStep" resultType="com.dare.modules.system.entity.File">
+        select id, file_name, project_no, apqp_no, file_path, gmt_created, gmt_modified, examined, jointly_signed, approved, edition, sign_file, progress_rate, reject
+        from apqp_file
+        where project_no = #{projectNo} AND reject = 0 AND
+        apqp_no IN (select apqp_step_no
+        from apqp_schedule
+        where project_no = #{projectNo} AND file_state = 1
+        AND
+        id &lt; (
+        select id
+        from apqp_schedule
+        where project_no = #{projectNo} AND apqp_step_no = #{apqpNo}
+        )
+        )
+    </select>
+    <select id="getSignFilePath" resultType="java.lang.String">
+        select sign_file
+        from apqp_file
+        where
+        project_no = #{projectNo} AND apqp_no = #{apqpNo} AND reject = 0
+    </select>
+    <select id="isExamined" resultType="java.lang.Integer">
+        select examined
+        from apqp_file
+        where project_no = #{projectNo} AND apqp_no = #{apqpNo} AND reject = 0
+    </select>
+
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.apqp.mapper.CustomerMapper">
+    <insert id="save" parameterType="Project">
+        insert into
+        customer(id, customer_no, customer_name, contact_person, tel, gmt_create, gmt_modified)
+        values
+        (#{id}, #{customerNo}, #{customerName}, #{contactPerson}, #{tel}, #{gmtCreate}, #{gmtModified})
+    </insert>
+    <select id="findAll" resultType="com.dare.modules.apqp.entity.Customer">
+        select c.id, c.customer_no, c.customer_name, c.contact_person, c.tel, c.gmt_create
+        from customer c
+        order by id
+    </select>
+
+
+</mapper>

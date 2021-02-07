@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.hrm.mapper.EmployeeMapper">
+    
+
+<!--        <resultMap id="empMap" type="Map">-->
+<!--            <id property="id" column="id"/>-->
+<!--            <result property="emp_no" column="emp_no"/>-->
+<!--            <result property="emp_name" column="emp_name"/>-->
+<!--            <result property="dept_name" column="dept_name"/>-->
+<!--            <result property="position_name" column="position_name"/>-->
+<!--            <result property="sex" column="sex"/>-->
+<!--            <result property="identity_no" column="identity_no"/>-->
+<!--            <result property="birthday" column="birthday"/>-->
+<!--            <result property="telephone" column="telephone"/>-->
+<!--            <result property="address" column="address"/>-->
+<!--            <result property="entry_date" column="entry_date"/>-->
+<!--            <result property="education" column="education"/>-->
+<!--            <result property="graduate_school" column="graduate_school"/>-->
+<!--            <result property="gmt_create" column="gmt_create"/>-->
+<!--            <result property="gmt_modified" column="gmt_modified"/>-->
+<!--        </resultMap>-->
+
+    <select id="findAll" resultType="Employee">
+        select e.*, d.dept_name, p.position_name
+        from hrm_employee e
+        left join hrm_dept d on e.dept_id=d.dept_id
+        left join hrm_position p on e.position_id=p.position_id
+        order by id
+    </select>
+
+    <select id="queryByEmpNo" resultType="Employee">
+        select e.*, d.dept_name, p.position_name
+        from hrm_employee e
+        left join hrm_dept d on e.dept_id=d.dept_id
+        left join hrm_position p on e.position_id=p.position_id
+        where e.emp_no=#{empNo}
+    </select>
+
+    <delete id="deleteByEmpNo" parameterType="String">
+        delete from hrm_employee where emp_no=#{empNo}
+    </delete>
+
+    <insert id="save" parameterType="Employee">
+        insert into
+        hrm_employee(id, emp_no, emp_name, sex, dept_id, position_id, identity_no,
+        birthday, telephone, address, entry_date, education, graduate_school, gmt_create, gmt_modified)
+        values
+        (#{id}, #{empNo}, #{empName}, #{sex}, #{deptId}, #{positionId}, #{identityNo},
+        #{birthday}, #{telephone}, #{address}, #{entryDate}, #{education}, #{graduateSchool}, #{gmtCreate}, #{gmtModified})
+    </insert>
+
+    <update id="edit" parameterType="Employee">
+        update hrm_employee set
+        emp_name=#{empName}, sex=#{sex}, dept_id=#{deptId}, position_id=#{positionId},
+        identity_no=#{identityNo}, birthday=#{birthday}, telephone=#{telephone}, address=#{address},
+        entry_date=#{entryDate}, education=#{education}, graduate_school=#{graduateSchool}, gmt_modified=#{gmtModified}
+        where emp_no=#{empNo}
+    </update>
+
+    <select id="queryByDeptNo" resultType="com.dare.modules.hrm.vo.EmployeeVO">
+        select e.emp_no, e.emp_name
+        from hrm_employee e
+        where dept_id = #{deptNo}
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,81 @@
+server:
+  servlet:
+    context-path: /dare
+  port: 8081
+
+spring:
+  datasource:
+    username: root
+    password: dly2020@
+    url: jdbc:mysql://124.70.63.121:3306/dare?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    #druid 数据源专有配置
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    #配置监控统计拦截的filters，stat:监控统计、log4j：日志记录、wall：防御sql注入
+    #如果允许时报错  java.lang.ClassNotFoundException: org.apache.log4j.Priority
+    #则导入 log4j 依赖即可，Maven 地址：https://mvnrepository.com/artifact/log4j/log4j
+    filters: stat,wall,log4j
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+  servlet:
+    multipart:
+      max-request-size: 500MB
+      enabled: true
+      max-file-size: 500MB
+      file-size-threshold: 500MB
+  redis:
+    port: 6379
+    host: 124.70.63.121
+    password: dly2020@
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+      shutdown-timeout: 100ms
+    database: 0
+
+logging:
+  level:
+    root: info
+    com.dare.modules: debug
+  #  pattern:
+  #    console: '%d{yyyy-MMM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n'
+  #    file: '%d{yyyy-MMM-dd HH:mm:ss.SSS} == [%thread] == %-5level == %logger{50} == - %msg%n'
+  #  file:
+  #    path: ../logs
+  #    max-history: 30
+  #    max-size: 10MB
+  #    name: ../logs/deer-%d{yyyy-MM-dd}.%i.log
+
+
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countsql
+
+mybatis:
+  mapper-locations: classpath:mappers/**/*.xml
+  type-aliases-package: com.dare.modules.**.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+minIo:
+  endpoint: http://124.70.63.121:9000
+  accessKey: minioroot2020
+  secretKey: miniodly2020@

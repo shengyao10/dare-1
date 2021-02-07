@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.apqp.mapper.APQPMapper">
+
+    <insert id="saveProAPQPStepDetail" parameterType="List">
+        insert into apqp_schedule(apqp_step_no, project_no, leader, dept, plan_start, plan_end, plan_period,
+        gmt_created) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.projectNo}, #{item.staff}, #{item.department}, #{item.planStart}, #{item.planEnd},
+            #{item.planPeriod}, #{item.gmtCreated})
+        </foreach>
+    </insert>
+    <insert id="saveProjectAPQPStep" parameterType="List">
+        insert into apqp_schedule(apqp_step_no, apqp_step_p_no, project_no, leader, dept, plan_start, plan_end,
+        plan_period, state, file_state, gmt_created) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.pid}, #{item.projectNo}, #{item.staff}, #{item.department}, #{item.planStart},
+            #{item.planEnd}, #{item.planPeriod}, #{item.state}, #{item.fileState}, #{item.gmtCreated})
+        </foreach>
+    </insert>
+    <insert id="saveList">
+        insert into apqp_schedule(project_no, apqp_step_no, apqp_step_p_no, plan_start, plan_end, plan_period,
+        real_period, real_start, real_end, leader, notes, state, file_state, dept, gmt_created, gmt_modified)
+        values
+        <foreach collection="schedules" item="item" separator=",">
+            (#{item.projectNo}, #{item.apqpStepNo}, #{item.apqpStepPNo}, #{item.planStart}, #{item.planEnd},
+            #{item.planPeriod}, #{item.realPeriod}, #{item.realStart},
+            #{item.realEnd}, #{item.leader}, #{item.notes}, #{item.state}, #{item.fileState}, #{item.dept},
+            #{item.gmtCreated}, #{item.gmtModified})
+        </foreach>
+    </insert>
+
+    <select id="getStep0" resultType="com.dare.modules.apqp.vo.APQPStepVO">
+        select a.id, a.pid, a.label
+        from apqp_all a
+        where a.is_item = 1
+        order by no
+    </select>
+
+    <select id="getAllStep" resultType="com.dare.modules.apqp.vo.APQPStepVO">
+        select a.id, a.pid, a.label
+        from apqp_all a
+        where a.is_item = 0
+        order by no
+    </select>
+
+    <select id="test" resultType="com.dare.modules.apqp.vo.APQPStepVO">
+--         select a.id, a.name, a.no
+--         from test a
+--         where a.is_item = 0
+--         order by id
+    </select>
+    <select id="queryProjectDetail" resultType="com.dare.modules.project.vo.ProjectDetailVO">
+        select aa.id, aa.pid, aa.label, asd.plan_start, asd.plan_end, asd.plan_period, asd.dept, d.dept_name, asd.leader, e.emp_name, asd.state
+        from apqp_all aa, apqp_schedule asd
+        LEFT JOIN hrm_employee e on asd.leader = e.emp_no
+        LEFT JOIN hrm_dept d on asd.dept = d.dept_id
+        where asd.project_no = #{projectNo} AND aa.id = asd.apqp_step_no
+        order by asd.id asc
+    </select>
+    <select id="queryProjectParentDetail" resultType="com.dare.modules.project.vo.ProjectDetailVO">
+        select distinct a1.id, a1.pid, a1.label
+        from apqp_all a1, apqp_all a2, apqp_schedule asd
+        where (asd.project_no = #{projectNo} AND a1.id = asd.apqp_step_p_no)
+        OR (a1.id = a2.pid AND asd.project_no = #{projectNo} AND a2.id = asd.apqp_step_p_no )
+    </select>
+    <select id="getSchedule" resultType="com.dare.modules.project.vo.ScheduleVO">
+
+    </select>
+    <select id="getScheduleId" resultType="java.lang.Integer">
+        select id
+        from apqp_schedule
+        where project_no = #{projectNo} AND apqp_step_no = #{apqpNo}
+    </select>
+    <select id="visualization" resultType="com.dare.modules.project.vo.ProjectDetailVO">
+        select aa.id, aa.pid, aa.label, asd.plan_start, asd.plan_end, asd.plan_period, asd.dept, d.dept_name, asd.leader, e.emp_name, asd.state, f.progress_rate
+        from apqp_all aa, apqp_schedule asd
+        LEFT JOIN hrm_employee e on asd.leader = e.emp_no
+        LEFT JOIN hrm_dept d on asd.dept = d.dept_id
+        LEFT JOIN apqp_file f on asd.project_no = f.project_no AND asd.apqp_step_no = f.apqp_no AND f.reject = 0
+        where asd.project_no = #{projectNo} AND aa.id = asd.apqp_step_no
+        order by asd.id asc
+    </select>
+    <select id="getScheduleBeforeStep" resultType="com.dare.modules.project.vo.ScheduleVO">
+        select id, project_no, apqp_step_no, apqp_step_p_no, plan_start, plan_end, plan_period, real_period, real_start, real_end, leader, notes, state, file_state, dept, gmt_created, gmt_modified
+        from apqp_schedule
+        where project_no = #{projectNo} AND
+        id &lt; (
+        select id
+        from apqp_schedule
+        where project_no = #{projectNo} AND apqp_step_no = #{apqpNo}
+        )
+    </select>
+    <select id="findSchedule" resultType="java.lang.Integer">
+        select count(*)
+        from apqp_schedule
+        where project_no = #{projectNo} AND apqp_step_no= #{apqpNo}
+    </select>
+
+</mapper>

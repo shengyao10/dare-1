@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.system.mapper.UserMapper">
+
+    <!-- 根据用户名查询 -->
+    <select id="getUserByName" resultType="com.dare.modules.system.entity.User">
+		select * from  sys_user  where username = #{username}
+	</select>
+    <select id="getUserInfoByUserName" resultType="com.dare.modules.system.vo.UserInfoVO">
+        select u.username,  e.emp_no, r.role, e.emp_name, e.sex, e.dept_id,d.dept_name, e.position_id, p.position_name, e.identity_no, e.birthday, e.telephone, e.address, e.entry_date, e.education, e.graduate_school
+        from hrm_employee e, hrm_dept d, hrm_position p, sys_user u, sys_role r, sys_user_role ur
+        where u.username = #{username} AND u.emp_no = e.emp_no AND e.dept_id = d.dept_id AND e.position_id = p.position_id AND ur.user_id = u.id AND r.id=ur.role_id
+        limit 1
+    </select>
+    <select id="getEmpNameByUsername" resultType="java.lang.String">
+        select e.emp_name
+        from sys_user u, hrm_employee e
+        where u.username = #{username} AND u.emp_no = e.emp_no
+    </select>
+
+    <insert id="save" parameterType="User">
+        insert into sys_user
+        (id, username, password, salt)
+        values
+        (#{id}, #{username}, #{password}, #{salt})
+    </insert>
+    <update id="updatePassword" parameterType="com.dare.modules.system.entity.User">
+        update sys_user set
+        password = #{password},salt=#{salt}
+        where username = #{username}
+    </update>
+
+</mapper>

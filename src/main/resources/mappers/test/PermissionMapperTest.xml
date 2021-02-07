@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.test.mapper.PermissionMapper">
+    <update id="updateExamine" parameterType="com.dare.modules.test.entity.PermissionTest">
+        update examine set
+        step1 = if(step1=#{step1},step1,#{step1}),
+        step2 = if(step2=#{step2},step2,#{step2}),
+        step3 = if(step3=#{step3},step3,#{step3}),
+        step4 = if(step4=#{step4},step4,#{step4})
+        where emp_no=#{empNo}
+    </update>
+    <update id="updateJointlySign" parameterType="com.dare.modules.test.entity.PermissionTest">
+        update jointly_sign set
+        step1 = if(step1=#{step1},step1,#{step1}),
+        step2 = if(step2=#{step2},step2,#{step2}),
+        step3 = if(step3=#{step3},step3,#{step3}),
+        step4 = if(step4=#{step4},step4,#{step4})
+        where emp_no=#{empNo}
+    </update>
+    <select id="SelectAllExamine" resultType="com.dare.modules.test.entity.PermissionTest">
+        select e.*
+        from examine e
+    </select>
+    <select id="SelectAllJointlySign" resultType="com.dare.modules.test.entity.PermissionTest">
+        select j.*
+        from jointly_sign j
+    </select>
+
+
+</mapper>

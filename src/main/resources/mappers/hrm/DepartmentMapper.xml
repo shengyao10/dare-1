@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.hrm.mapper.DepartmentMapper">
+    <select id="SelectAllDepartment" resultType="com.dare.modules.hrm.entity.Department">
+        select *
+        from hrm_dept
+    </select>
+    <update id="UpdateDepartment" parameterType="com.dare.modules.hrm.entity.Department">
+        update hrm_dept set dept_name=#{deptName},dept_tel=#{deptTel},description=#{description},gmt_modified=#{time}
+        where dept_id=#{deptId}
+
+    </update>
+</mapper>

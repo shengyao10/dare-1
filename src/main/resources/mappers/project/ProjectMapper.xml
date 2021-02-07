@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dare.modules.project.mapper.ProjectMapper">
+
+    <insert id="save" parameterType="com.dare.modules.project.entity.Project">
+        insert into
+        project(id, project_no, project_name, customer_no, start_time, end_time, project_state, project_task, complete_task, apqp_state, pro_complete_state, created_by, gmt_created, gmt_modified)
+        values
+        (#{id}, #{projectNo}, #{projectName}, #{customerNo}, #{startTime}, #{endTime}, #{projectState}, #{projectTask}, #{completeTask}, #{apqpState}, #{proCompleteState}, #{createdBy}, #{gmtCreated}, #{gmtModified})
+    </insert>
+    <update id="submitCustomer">
+        update project
+        set customer_no = #{customerNo}, gmt_modified = #{time}
+        where project_no = #{projectNo}
+    </update>
+
+    <select id="findAll" resultType="com.dare.modules.project.vo.ProjectVO">
+        select p.id, p.project_no, p.project_name, p.project_state, p.created_by, p.gmt_created
+        from project p
+        order by p.gmt_created desc
+    </select>
+
+    <select id="queryByProNo" resultType="com.dare.modules.project.vo.ProjectVO">
+        select p.id, p.project_no, p.project_name, p.project_state, p.created_by, p.gmt_created
+        from project p
+        where p.project_no=#{projectNo}
+    </select>
+
+    <select id="queryByProState" resultType="com.dare.modules.project.vo.ProjectVO">
+        select p.id, p.project_no, p.project_name, p.project_state, p.created_by, p.gmt_created
+        from project p
+        where p.project_state=#{projectState}
+        order by p.gmt_created desc
+    </select>
+
+    <select id="getProCount" resultType="Integer">
+        select count(*) from project
+        order by id
+    </select>
+    <select id="queryByCompleteState" resultType="com.dare.modules.project.vo.ProjectListVO">
+        select p.id, p.project_no, p.project_name, p.pro_complete_state, p.created_by, p.gmt_created
+        from project p
+        where p.pro_complete_state=#{proCompleteStateState}
+        order by p.gmt_created desc
+    </select>
+    <select id="queryByProjectName" resultType="com.dare.modules.project.vo.ProjectListVO">
+        select p.id, p.project_no, p.project_name, p.pro_complete_state, p.created_by, p.gmt_created
+        from project p
+        where p.project_name like #{projectName}
+        order by p.gmt_created desc
+    </select>
+    <select id="getProjectList" resultType="com.dare.modules.project.vo.ProjectListVO">
+        select p.id, p.project_no, p.project_name, p.pro_complete_state, p.created_by, p.gmt_created
+        from project p
+        order by p.gmt_created desc
+    </select>
+
+    <select id="getTime" resultType="com.dare.modules.project.vo.ProjectVisualizationVO">
+        select id, project_no, project_name, start_time, end_time, created_by, project_task, complete_task
+        from project
+        where project_no = #{projectNo}
+    </select>
+
+    <!--查看所有项目的完成状态-->
+    <select id="getProjectState" resultType="com.dare.modules.project.vo.ProjectStateVO">
+        select p.id, p.project_no, p.project_name, p.project_state, p.created_by, p.gmt_created
+        from project p;
+    </select>
+    <select id="queryDetailByProNo" resultType="com.dare.modules.project.entity.Project">
+        select id, project_no, project_name, customer_no, start_time, end_time, apqp_state, project_state, project_task, complete_task, pro_complete_state, created_by, gmt_created, gmt_modified
+        from project
+        where project_no = #{projectNo}
+    </select>
+    <select id="getCompleteTaskNoBeforeStep" resultType="java.lang.Integer">
+        select count(*)
+        from apqp_schedule
+        where project_no = #{projectNo} AND state = 1
+        AND
+        id &lt; (
+        select id
+        from apqp_schedule
+        where project_no = #{projectNo} AND apqp_step_no = #{apqpNo}
+        )
+    </select>
+    <select id="getScheduleBeforeStep" resultType="com.dare.modules.project.vo.ScheduleVO">
+        select
+        from apqp_schedule
+    </select>
+    <select id="getTaskNoBeforeStep" resultType="java.lang.Integer">
+        select count(*)
+        from apqp_schedule
+        where project_no = #{projectNo}
+        AND
+        id &lt; (
+        select id
+        from apqp_schedule
+        where project_no = #{projectNo} AND apqp_step_no = #{apqpNo}
+        )
+    </select>
+    <select id="findCustomerNo" resultType="java.lang.String">
+        select customer_no
+        from project
+        where project_no = #{projectNo}
+    </select>
+</mapper>
